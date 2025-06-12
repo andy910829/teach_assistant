@@ -1,115 +1,13 @@
 請評分以下學生的作業：
 
-學號：112368083
-姓名：蕭力瑋
+學號：112368087
+姓名：林峻葳
+
+檔案結構:
+📄 112368087_hw15_0102.zip
 
 程式碼：
-
-C 檔案：
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-typedef enum {
-    CHT,
-    FET,
-    TWN
-} Operator;
-
-typedef union {
-    struct {
-        int area_code;
-        int number;
-    } home;
-    struct {
-        Operator operator;
-        int number;
-    } cellular;
-} PhoneNumber;
-
-typedef struct Node {
-    char name[10];
-    int type;
-    PhoneNumber phone;
-    struct Node *next;
-} Node;
-
-Node* createNode(char *name, int type, PhoneNumber phone) {
-    Node *newNode = (Node *)malloc(sizeof(Node));
-    strcpy(newNode->name, name);
-    newNode->type = type;
-    newNode->phone = phone;
-    newNode->next = NULL;
-    return newNode;
-}
-
-void appendNode(Node **head, Node *newNode) {
-    if (*head == NULL) {
-        *head = newNode;
-    } else {
-        Node *temp = *head;
-        while (temp->next != NULL) {
-            temp = temp->next;
-        }
-        temp->next = newNode;
-    }
-}
-
-void displayList(Node *head) {
-    Node *temp = head;
-    while (temp != NULL) {
-        printf("Name: %s\n", temp->name);
-        if (temp->type == 0) {
-            printf("Home Phone - Area Code: %d, Number: %d\n", temp->phone.home.area_code, temp->phone.home.number);
-        } else {
-            printf("Cellular Phone - Operator: %s, Number: %d\n",
-                   temp->phone.cellular.operator == CHT ? "CHT" :
-                   temp->phone.cellular.operator == FET ? "FET" : "TWN",
-                   temp->phone.cellular.number);
-        }
-        temp = temp->next;
-    }
-}
-
-int main() {
-    Node *head = NULL;
-    char name[10];
-    int choice, type;
-    PhoneNumber phone;
-
-    while (1) {
-        printf("Enter 1 to add user, 0 to exit: ");
-        scanf("%d", &choice);
-
-        if (choice == 0) break;
-
-        if (choice == 1) {
-            printf("Enter Name: ");
-            scanf("%s", name);
-            printf("Enter 0 for Home or 1 for Cellular: ");
-            scanf("%d", &type);
-
-            if (type == 0) {
-                printf("Enter Area Code: ");
-                scanf("%d", &phone.home.area_code);
-                printf("Enter Number: ");
-                scanf("%d", &phone.home.number);
-            } else {
-                printf("Enter Operator (0: CHT, 1: FET, 2: TWN): ");
-                scanf("%d", (int *)&phone.cellular.operator);
-                printf("Enter Number: ");
-                scanf("%d", &phone.cellular.number);
-            }
-
-            Node *newNode = createNode(name, type, phone);
-            appendNode(&head, newNode);
-            displayList(head);
-        }
-    }
-
-    return 0;
-}
-
+無程式碼提供，請根據檔案結構判斷是否需要解壓縮，解壓縮檔案路徑為C:\Users\Andy\Desktop\TeachAssistant\assignments\graded_homework\hw100034936\112368087_林峻葳  加上您需要解壓縮的檔名。請將該檔案的解壓縮目標設置為C:\Users\Andy\Desktop\TeachAssistant\assignments\graded_homework\hw100034936\112368087_林峻葳 
 
 評分標準：
 你是一位經驗豐富的C語言課程助教。你的任務是僅根據學生提交的程式碼進行靜態分析評分。
@@ -141,7 +39,7 @@ After finishing enter a new user, you should print all information
     - 是否有基本的錯誤處理邏輯？
 
 請根據你對學生程式碼的分析，提供一個總分和具體的評語。
-評語應該包含做得好的地方和可以改進的具體建議。
+評語應該包含做得好的地方和可以改進的具體建議並且使用繁體中文。
 
 請根據評分標準評分，並使用 write_grading_report 工具生成評分報告。
 評分報告應包含：
@@ -149,4 +47,4 @@ After finishing enter a new user, you should print all information
 2. 詳細評語
 3. 改進建議
 
-請確保評分報告的輸出路徑為：C:\Users\Andy\Desktop\TeachAssistant\assignments\graded_homework\112368083_蕭力瑋\grading_report.txt
+請確保評分報告的輸出路徑為：C:\Users\Andy\Desktop\TeachAssistant\assignments\graded_homework\hw100034936\112368087_林峻葳\grading_report.txt

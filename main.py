@@ -40,25 +40,50 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
     # 讀取學生的程式碼
     c_files = []
     h_files = []
+    other_files = []
+    file_structure = []
+    for root, dirs, files in os.walk(student_folder_path):
+        # 計算相對路徑
+        rel_path = os.path.relpath(root, student_folder_path)
+        if rel_path == '.':
+            rel_path = ''
+            
+        # 添加資料夾資訊
+        for dir_name in dirs:
+            file_structure.append(f"📁 {os.path.join(rel_path, dir_name)}/")
+            
+        # 添加檔案資訊
+        for file_name in files:
+            file_path = os.path.join(rel_path, file_name)
+            file_structure.append(f"📄 {file_path}")
+            
+            # 讀取檔案內容
+            full_path = os.path.join(root, file_name)
+            try:
+                with open(full_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    if file_name.endswith('.c'):
+                        c_files.append(content)
+                    elif file_name.endswith('.h'):
+                        h_files.append(content)
+                    else:
+                        other_files.append(f"檔案：{file_path}\n內容：\n{content}\n")
+            except UnicodeDecodeError:
+                # 如果檔案不是文字格式，只記錄檔案名稱
+                other_files.append(f"檔案：{file_path} (二進位檔案)")
+            except Exception as e:
+                other_files.append(f"檔案：{file_path} (無法讀取：{str(e)})")
     
-    for file in os.listdir(student_folder_path):
-        if file.endswith('.c'):
-            with open(os.path.join(student_folder_path, file), 'r', encoding='utf-8') as f:
-                c_files.append(f.read())
-        elif file.endswith('.h'):
-            with open(os.path.join(student_folder_path, file), 'r', encoding='utf-8') as f:
-                h_files.append(f.read())
-    
-    if not c_files and not h_files:
-        error_msg = "找不到 .c 或 .h 檔案"
-        await mcp_client.call_tool("write_grading_report", {
-            "student_id": student_id,
-            "student_name": student_name,
-            "score": 0,
-            "comments": error_msg,
-            "output_path": os.path.join(student_folder_path, "grading_report.txt")
-        })
-        return
+    # if not c_files and not h_files:
+    #     error_msg = "找不到 .c 或 .h 檔案"
+    #     await mcp_client.call_tool("write_grading_report", {
+    #         "student_id": student_id,
+    #         "student_name": student_name,
+    #         "score": 0,
+    #         "comments": error_msg,
+    #         "output_path": os.path.join(student_folder_path, "grading_report.txt")
+    #     })
+    #     return
     
     # 組合提示
     prompt = f"""請評分以下學生的作業：
@@ -66,13 +91,20 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
 學號：{student_id}
 姓名：{student_name}
 
+檔案結構:
+{chr(10).join(file_structure)}
+
 程式碼：
-"""
-    if c_files:
-        prompt += "\nC 檔案：\n" + "\n---\n".join(c_files)
-    if h_files:
-        prompt += "\n\n標頭檔：\n" + "\n---\n".join(h_files)
-        
+"""    
+    if not c_files and not h_files:
+        print("無代碼提供")
+        prompt += f"無程式碼提供，請根據檔案結構判斷是否需要解壓縮，解壓縮檔案路徑為{os.path.join(student_folder_path)}  加上您需要解壓縮的檔名。請將該檔案的解壓縮目標設置為{os.path.join(student_folder_path)} "
+    else:
+        print("有代碼提供")
+        if c_files:
+            prompt += "\nC 檔案：\n" + "\n---\n".join(c_files)
+        if h_files:
+            prompt += "\n\n標頭檔：\n" + "\n---\n".join(h_files)
     prompt += f"""
 
 評分標準：
@@ -86,6 +118,7 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
 
 請確保評分報告的輸出路徑為：{os.path.join(student_folder_path, "grading_report.txt")}
 """
+    print(f"Prompt: {prompt}")
     with open("prompt.txt", 'w', encoding='utf-8') as f:
         f.write(prompt)
     # 生成評分
@@ -94,8 +127,11 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
     if "tool_calls" in response:
         for tool_call in response["tool_calls"]:
             if tool_call["tool"] == "write_grading_report":
-                await mcp_client.call_tool("write_grading_report", tool_call["parameters"])
-        
+                info = await mcp_client.call_tool("write_grading_report", tool_call["parameters"])
+                return 'STOP', info 
+            if tool_call["tool"] == "unzip_folder":
+                info = await mcp_client.call_tool("unzip_folder", tool_call['parameters'])
+                return 'KEEP', info
     # except Exception as e:
     #     print(f"評分過程發生錯誤：{str(e)}")
     #     # 寫入錯誤報告
@@ -141,10 +177,14 @@ async def main():
 
     # 獲取解壓縮後的目錄
     main_homework_folder = unzip_target_dir
-
     if not os.path.isdir(main_homework_folder):
         print(f"[錯誤] 解壓縮目錄不存在: {main_homework_folder}")
         return
+
+    if len(os.listdir(main_homework_folder))<=1:
+        while len(os.listdir(main_homework_folder))<=1:
+            main_homework_folder = os.path.join(main_homework_folder, os.listdir(main_homework_folder)[0])
+        print(main_homework_folder)
 
     # 遍歷所有學生資料夾
     for student_dir_name in os.listdir(main_homework_folder):
@@ -152,7 +192,14 @@ async def main():
         
         # 如果是目錄，直接處理
         if os.path.isdir(student_folder_path):
-            await grade_single_student(student_folder_path, model, mcp_client)
+            result = await grade_single_student(student_folder_path, model, mcp_client)
+            while True:
+                result, info = await grade_single_student(student_folder_path, model, mcp_client)
+                print(f"Result: {result}")
+                if result == 'STOP':
+                    break
+                # elif result == "KEEP":
+                #     student_folder_path = info
         # 如果是壓縮檔，先解壓縮再處理
         elif student_dir_name.endswith(('.zip', '.rar')):
             nested_zip_path = student_folder_path
@@ -162,7 +209,7 @@ async def main():
                 "target_path": nested_extract_dir
             })
             if "成功" in nested_result:
-                await grade_single_student(nested_extract_dir, model, mcp_client)
+                result = await grade_single_student(nested_extract_dir, model, mcp_client)
             else:
                 print(f"[錯誤] 無法解壓縮學生作業: {student_dir_name}")
                 print(nested_result)

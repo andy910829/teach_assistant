@@ -71,11 +71,13 @@ class AgentGemini:
         # 檢查是否有函數調用
         print("================== GEMINI response ==================")
         print(response.candidates[0])
+        # print(response)
 
         max_try = 3
         current_try = 0
 
         while current_try < max_try:
+            try:
                 function_call = None
                 text_response = None
                     
@@ -97,7 +99,7 @@ class AgentGemini:
                             "parameters": function_call.args
                         }]
                     }
-                elif candidate.finish_reason == "MALFORMED_FUNCTION_CALL":
+                elif candidate.finish_reason == 10:
                     current_try += 1
                     if current_try >= max_try:
                         return {
@@ -116,4 +118,9 @@ class AgentGemini:
                         return {
                             "response": response.text,
                             "tool_calls": []
-                        }                  
+                        }      
+            except Exception as e:
+                print("================== GEMINI response ==================")
+                print(response.candidates[0].finish_reason)
+                print(response)     
+                current_try += 1       

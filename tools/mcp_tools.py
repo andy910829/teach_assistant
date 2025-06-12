@@ -81,6 +81,7 @@ def write_grading_report(student_id: str, student_name: str, score: int, comment
     except Exception as e:
         return f"寫入評分報告時發生錯誤：{str(e)}"
 
+
 # def register_tools():
 #     """註冊所有工具"""
 #     return mcp 
