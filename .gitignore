@@ -1,0 +1,4 @@
+assignments/
+.venv/
+__pycache__/
+.env

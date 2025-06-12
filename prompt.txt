@@ -1,0 +1,152 @@
+請評分以下學生的作業：
+
+學號：112368083
+姓名：蕭力瑋
+
+程式碼：
+
+C 檔案：
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef enum {
+    CHT,
+    FET,
+    TWN
+} Operator;
+
+typedef union {
+    struct {
+        int area_code;
+        int number;
+    } home;
+    struct {
+        Operator operator;
+        int number;
+    } cellular;
+} PhoneNumber;
+
+typedef struct Node {
+    char name[10];
+    int type;
+    PhoneNumber phone;
+    struct Node *next;
+} Node;
+
+Node* createNode(char *name, int type, PhoneNumber phone) {
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    strcpy(newNode->name, name);
+    newNode->type = type;
+    newNode->phone = phone;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void appendNode(Node **head, Node *newNode) {
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        Node *temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+}
+
+void displayList(Node *head) {
+    Node *temp = head;
+    while (temp != NULL) {
+        printf("Name: %s\n", temp->name);
+        if (temp->type == 0) {
+            printf("Home Phone - Area Code: %d, Number: %d\n", temp->phone.home.area_code, temp->phone.home.number);
+        } else {
+            printf("Cellular Phone - Operator: %s, Number: %d\n",
+                   temp->phone.cellular.operator == CHT ? "CHT" :
+                   temp->phone.cellular.operator == FET ? "FET" : "TWN",
+                   temp->phone.cellular.number);
+        }
+        temp = temp->next;
+    }
+}
+
+int main() {
+    Node *head = NULL;
+    char name[10];
+    int choice, type;
+    PhoneNumber phone;
+
+    while (1) {
+        printf("Enter 1 to add user, 0 to exit: ");
+        scanf("%d", &choice);
+
+        if (choice == 0) break;
+
+        if (choice == 1) {
+            printf("Enter Name: ");
+            scanf("%s", name);
+            printf("Enter 0 for Home or 1 for Cellular: ");
+            scanf("%d", &type);
+
+            if (type == 0) {
+                printf("Enter Area Code: ");
+                scanf("%d", &phone.home.area_code);
+                printf("Enter Number: ");
+                scanf("%d", &phone.home.number);
+            } else {
+                printf("Enter Operator (0: CHT, 1: FET, 2: TWN): ");
+                scanf("%d", (int *)&phone.cellular.operator);
+                printf("Enter Number: ");
+                scanf("%d", &phone.cellular.number);
+            }
+
+            Node *newNode = createNode(name, type, phone);
+            appendNode(&head, newNode);
+            displayList(head);
+        }
+    }
+
+    return 0;
+}
+
+
+評分標準：
+你是一位經驗豐富的C語言課程助教。你的任務是僅根據學生提交的程式碼進行靜態分析評分。
+請不要假設程式碼可以運行，僅從程式碼本身的可讀性、結構、邏輯和潛在問題來評分。
+
+本次作業的要求以及目標為:
+Write a program to allow user to enter “Name” and “Phone number”
+Store the name by char name[10]
+Phone number may have two types: “home” or “cellular” (integrated by union)
+For the home number, you should record the area code and number 
+For the cellular phone number, you should record operator’s name by enum (CHT, FET, TWN) and number
+The inputted information should be maintained by a linked list
+After finishing enter a new user, you should print all information
+
+評分標準如下 (總分100分):
+1.  **程式碼可讀性 (40分)**:
+    - 變數和函數命名是否清晰、有意義？
+    - 是否有適當的縮排和排版，使程式碼易於閱讀？
+    - 是否有適當且有幫助的註解來解釋複雜的程式碼區塊？
+
+2.  **程式碼結構與設計 (40分)**:
+    - 程式碼的邏輯是否清晰，容易理解？
+    - 是否有良好的模組化，例如將重複的程式碼封裝成函數？
+    - main 函數是否簡潔，主要邏輯是否由其他函數完成？
+
+3.  **最佳實踐與潛在錯誤 (20分)**:
+    - 是否有使用到不安全的函數 (如 gets)？
+    - 是否有考慮到指標的正確使用和記憶體管理 (雖然無法運行，但可以從程式碼看出意圖)？
+    - 是否有基本的錯誤處理邏輯？
+
+請根據你對學生程式碼的分析，提供一個總分和具體的評語。
+評語應該包含做得好的地方和可以改進的具體建議。
+
+請根據評分標準評分，並使用 write_grading_report 工具生成評分報告。
+評分報告應包含：
+1. 分數（0-100）
+2. 詳細評語
+3. 改進建議
+
+請確保評分報告的輸出路徑為：C:\Users\Andy\Desktop\TeachAssistant\assignments\graded_homework\112368083_蕭力瑋\grading_report.txt
