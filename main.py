@@ -97,10 +97,8 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
 程式碼：
 """    
     if not c_files and not h_files:
-        print("無代碼提供")
         prompt += f"無程式碼提供，請根據檔案結構判斷是否需要解壓縮，解壓縮檔案路徑為{os.path.join(student_folder_path)}  加上您需要解壓縮的檔名。請將該檔案的解壓縮目標設置為{os.path.join(student_folder_path)} "
     else:
-        print("有代碼提供")
         if c_files:
             prompt += "\nC 檔案：\n" + "\n---\n".join(c_files)
         if h_files:
@@ -127,11 +125,11 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
     if "tool_calls" in response:
         for tool_call in response["tool_calls"]:
             if tool_call["tool"] == "write_grading_report":
-                info = await mcp_client.call_tool("write_grading_report", tool_call["parameters"])
-                return 'STOP', info 
+                await mcp_client.call_tool("write_grading_report", tool_call["parameters"])
+                return 'STOP' 
             if tool_call["tool"] == "unzip_folder":
-                info = await mcp_client.call_tool("unzip_folder", tool_call['parameters'])
-                return 'KEEP', info
+                await mcp_client.call_tool("unzip_folder", tool_call['parameters'])
+                return 'KEEP'
     # except Exception as e:
     #     print(f"評分過程發生錯誤：{str(e)}")
     #     # 寫入錯誤報告
@@ -194,12 +192,9 @@ async def main():
         if os.path.isdir(student_folder_path):
             result = await grade_single_student(student_folder_path, model, mcp_client)
             while True:
-                result, info = await grade_single_student(student_folder_path, model, mcp_client)
-                print(f"Result: {result}")
+                result = await grade_single_student(student_folder_path, model, mcp_client)
                 if result == 'STOP':
                     break
-                # elif result == "KEEP":
-                #     student_folder_path = info
         # 如果是壓縮檔，先解壓縮再處理
         elif student_dir_name.endswith(('.zip', '.rar')):
             nested_zip_path = student_folder_path
