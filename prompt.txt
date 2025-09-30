@@ -1,50 +1,337 @@
 請評分以下學生的作業：
 
-學號：112368087
-姓名：林峻葳
+學號：114C73032
+姓名：王界棠
 
 檔案結構:
-📄 112368087_hw15_0102.zip
+📄 114C73032_tonyW01.c
+📄 114C73032_tonyW01.exe
+📄 114C73032_W03.c
 
 程式碼：
-無程式碼提供，請根據檔案結構判斷是否需要解壓縮，解壓縮檔案路徑為C:\Users\Andy\Desktop\TeachAssistant\assignments\graded_homework\hw100034936\112368087_林峻葳  加上您需要解壓縮的檔名。請將該檔案的解壓縮目標設置為C:\Users\Andy\Desktop\TeachAssistant\assignments\graded_homework\hw100034936\112368087_林峻葳 
+
+C 檔案：
+#include<stdio.h>
+// 標準化顯示庫
+
+#include<string.h>
+//標準化字串庫
+
+int main(void){
+
+    char alphabet[100];
+    // 這邊要先定義陣列裡面可以存多少個字元
+
+    printf("Please input a character sequence:");
+ 
+    scanf("%s",alphabet);
+    // 當scanf 執行時，我的alpahabet這時才會接收到使用者的變數
+
+    // "%s" ->取字串
+
+
+    int theChare = 0 ;
+
+    int lenth = strlen(alphabet);
+    // 因為scanf已經輸入，因此才會有正確的字串長度
+    
+
+
+    // printf("Please input a character sequence:");
+ 
+    // scanf("%s",alphabet);
+    // 輸入對應的字元
+    // %s ->定義資料型態是字元
+
+        for (int i =0  ; i < lenth ; i++){     
+            for(int j = i+1 ; j < lenth ; j++){
+                
+               if (alphabet[i] > alphabet[j] ){
+               
+                    theChare++;
+               
+                }   
+            }
+        } 
+
+     printf("number of inversions : %d \n ", theChare);
+            //& theChartt
+     return 0;
+
+    }
+
+             // ++ i -> 執行前往後移一格
+            // i++ ->執行後往後移一格
+            // strlen(alphabet) ->計算向量裡有多少個字母
+
+---
+#include <stdio.h>
+// I/O顯示函式庫
+
+#include<stdlib.h>
+// 目前用來生記憶體
+
+typedef struct  num_list
+// 宣告一個資料結構 叫 num_list
+{
+    int counts;
+
+    int* p_list;
+
+}tNumList;
+// tNumList = int的概念
+
+void fill_list (tNumList* list);
+
+void bubble_sor (tNumList* list);
+
+void merge (tNumList* list1 ,tNumList* list2);
+
+void print_list (tNumList* list);
+
+// tNumList -> int 的概念
+
+int main(void){
+
+    tNumList* list1, *list2 ;
+    // 兩個指標
+
+        list1 = (tNumList*) malloc(sizeof(tNumList));
+        // 只要為工單分配一個結構
+            fill_list (list1);
+
+            bubble_sor(list1);
+
+            printf("sorted list1: ");
+
+            print_list(list1);
+
+
+        // 理解這邊的counts
+
+        list2 = (tNumList*) malloc(sizeof(tNumList));
+
+            fill_list (list2);
+
+            bubble_sor(list2);
+
+            printf("sorted list2: ");
+
+            print_list(list2);
+
+            printf("merged list: ");
+
+            merge(list1,list2);
+
+
+            free(list1->p_list);
+
+            free(list2->p_list);
+
+            free(list1);
+
+            free(list2);
+            
+            return 0;
+
+}
+
+/*輸入指令*/
+
+void fill_list (tNumList* list)
+{
+    // 這邊list 就是任意變數
+   
+        printf("Please enter how many number in list:" );
+
+        scanf("%d", &(list -> counts));
+
+        // 這邊是存入動態空間 (指標指向)
+
+        list -> p_list = (int*) malloc ((list -> counts) * sizeof(int));
+        // 指向並存入這個新的記憶體空間門牌
+
+            for(int i = 0 ; i < (list -> counts) ; i++)
+            {
+               
+                scanf("%d", &(list->p_list[i]));
+                            //輸入對應的空間
+                            //錯誤點1
+            }
+        
+        printf("\n");
+
+}
+
+/*氣泡排序*/
+
+void bubble_sor (tNumList* list)
+{
+
+    int bus = 0 ;
+
+    for(int i = 0 ; i < (list-> counts-1) ;i++)
+                        // 這邊存取不用括號 (把他當陣列來看)
+    {
+        for(int j = 0 ; j < (list-> counts-1 - i) ; j++)
+                        // 這邊存取不用括號
+        {
+            if(list -> p_list[i] > list -> p_list [j+1])
+
+            {          
+                bus = list -> p_list[i];
+
+                list -> p_list[i] = list -> p_list[j+1];
+
+                list -> p_list [j+1] =bus; 
+    
+            }
+
+        }
+
+    }
+
+ }
+
+ /*組合結果
+ 
+ 寫筆記*/
+
+void merge (tNumList* list1 ,tNumList* list2)
+{
+
+    int i = 0 ,j = 0 ;
+
+
+    while ( i< (list1 -> counts) && j < (list2 -> counts))
+    {
+        if(list1 -> p_list [i] < list2 -> p_list[j])
+        {
+           printf("%d ", list1 -> p_list[i++]);
+
+        }
+        else
+        {
+            printf("%d ", list2 -> p_list[j++]);
+        }
+
+    }
+
+    while (i < (list1 -> counts))
+    {
+
+        printf("%d ", list1 -> p_list[i++]);
+
+    }
+    
+    while (j < (list2 -> counts))
+    {
+
+        printf("%d ", list2 -> p_list[j++]);
+    }
+
+    printf("\n");
+
+    
+}
+
+/*顯示函數*/
+
+void print_list (tNumList* list)
+{
+    for(int i = 0 ; i < list-> counts ; i++)
+    {
+
+        printf("%d ", (list-> p_list[i]));
+
+    }
+    
+    printf("\n");
+} 
+
+  // 這邊是將code寫入
+
+ // 這個是依據 tNumlist 建立對應的記憶體空間
+
+// tNumList 就像 DB -> 當你有新增資料時，才挖記憶體
+        
+// 目前這個意思是 我將這塊記憶體空間 使用 list1指向他
+
+// list -> p_list 這邊要以資料結構的角度看
 
 評分標準：
 你是一位經驗豐富的C語言課程助教。你的任務是僅根據學生提交的程式碼進行靜態分析評分。
-請不要假設程式碼可以運行，僅從程式碼本身的可讀性、結構、邏輯和潛在問題來評分。
+從程式碼本身的可讀性、結構、邏輯和潛在問題來評分。
+如果程式碼有明顯漏洞導致不能運行請指出並且評分為70分。
 
-本次作業的要求以及目標為:
-Write a program to allow user to enter “Name” and “Phone number”
-Store the name by char name[10]
-Phone number may have two types: “home” or “cellular” (integrated by union)
-For the home number, you should record the area code and number 
-For the cellular phone number, you should record operator’s name by enum (CHT, FET, TWN) and number
-The inputted information should be maintained by a linked list
-After finishing enter a new user, you should print all information
+本次作業的具體內容如下:
+本週的 C 語言作業，旨在讓學生練習透過「指標運算」來操作陣列，並熟悉命令列參數的處理。
 
-評分標準如下 (總分100分):
-1.  **程式碼可讀性 (40分)**:
+請您在批改時，確認學生的程式是否完成以下幾個核心要求：
+
+1.  **資料結構：**
+    *   必須使用指定的 `tNumList` 結構來儲存每一個列表的資訊。這個結構包含：
+        *   `int counts`: 用來記錄列表中有多少個數字。
+        *   `int *p_list`: 一個整數指標，指向動態配置的記憶體，用來存放列表中的所有數字。
+
+2.  **函式實作：**
+    *   程式中必須包含並實作以下四個函式：
+        *   `void fill_list(tNumList *list)`: 填充列表內容。
+        *   `void bubble_sort(tNumList *list)`: 對列表進行氣泡排序。
+        *   `void merge(tNumList *list1, tNumList *list2)`: 合併兩個已排序的列表。
+        *   `void print_list(tNumList *list)`: 印出列表內容。
+
+3.  **主程式 (`main` function)：**
+    *   需要宣告兩個 `tNumList` 指標：`list1` 和 `list2`。
+    *   必須使用 `malloc` 動態配置記憶體給 `list1` 和 `list2`。
+
+4.  **合併 (merge) 階段的特別規則：**
+    *   **不可** 再次呼叫 `bubble_sort` 函式。
+    *   只需遍歷 (traverse) `list1` 和 `list2`，並 **直接印出** 合併排序後的結果。
+    *   **不允許** 建立一個新的列表來存放合併後的結果。整個程式中只能有 `list1` 和 `list2`。
+    *   **不可** 更改 `list1` 和 `list2` 的原始內容。
+
+5.  **記憶體與陣列宣告限制：**
+    *   `p_list` 指向的記憶體空間 **必須是動態配置的** (dynamically allocated)。
+    *   **禁止** 在程式中宣告任何陣列 (array)。但可以使用陣列索引的方式 (`array-accessing fashion`) 來存取 `p_list` 指向的動態記憶體資料。
+
+### 執行範例：
+程式執行時，會先要求使用者輸入第一個列表的數字數量與內容，接著是第二個列表。程式會印出各自排序後的結果，最後再印出合併兩個列表的結果。
+
+```
+Please enter how many numbers in list1: 3
+Please input 3 numbers: 7 1 2
+Please enter how many numbers in list2: 4
+Please input 4 numbers: 2 9 5 4
+
+sorted list1: 1 2 7
+sorted list2: 2 4 5 9
+merged list: 1 2 2 4 5 7 9
+```
+
+
+評分標準如下 (70-100分):
+1.  **程式碼可讀性 (5分)**:
     - 變數和函數命名是否清晰、有意義？
     - 是否有適當的縮排和排版，使程式碼易於閱讀？
     - 是否有適當且有幫助的註解來解釋複雜的程式碼區塊？
 
-2.  **程式碼結構與設計 (40分)**:
+2.  **程式碼結構與設計 (10分)**:
     - 程式碼的邏輯是否清晰，容易理解？
     - 是否有良好的模組化，例如將重複的程式碼封裝成函數？
-    - main 函數是否簡潔，主要邏輯是否由其他函數完成？
 
-3.  **最佳實踐與潛在錯誤 (20分)**:
-    - 是否有使用到不安全的函數 (如 gets)？
-    - 是否有考慮到指標的正確使用和記憶體管理 (雖然無法運行，但可以從程式碼看出意圖)？
-    - 是否有基本的錯誤處理邏輯？
+3.  **程式碼精簡度 (15分)(重點評分項目)**:
+    - 是否避免了重複或冗餘的程式碼？
+    - 是否使用適當的語法或內建函數來簡化程式碼？
+    - 整體邏輯是否直接且不繞路，沒有不必要的複雜步驟？
 
 請根據你對學生程式碼的分析，提供一個總分和具體的評語。
 評語應該包含做得好的地方和可以改進的具體建議並且使用繁體中文。
 
 請根據評分標準評分，並使用 write_grading_report 工具生成評分報告。
 評分報告應包含：
-1. 分數（0-100）
+1. 分數（70-100）
 2. 詳細評語
 3. 改進建議
 
-請確保評分報告的輸出路徑為：C:\Users\Andy\Desktop\TeachAssistant\assignments\graded_homework\hw100034936\112368087_林峻葳\grading_report.txt
+請確保評分報告的輸出路徑為：C:\Users\andy\Desktop\C語言助教\teach_assistant\assignments\graded_homework\114C73032_王界棠\grading_report.txt

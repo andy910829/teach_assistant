@@ -4,6 +4,7 @@ import zipfile
 import rarfile
 import shutil
 import logging
+import py7zr  # 導入 py7zr 函式庫
 
 # 設定 rarfile 的 unrar 工具路徑
 rarfile.UNRAR_TOOL = "C:\\Program Files\\WinRAR\\UnRAR.exe"
@@ -13,7 +14,7 @@ mcp = FastMCP("Teaching Assistant")
 
 @mcp.tool()
 def unzip_folder(source_path: str, target_path: str) -> str:
-    """解壓縮資料夾，支援 ZIP 和 RAR 格式"""
+    """解壓縮資料夾，支援 ZIP、RAR 和 7z 格式"""
     try:
         # 檢查來源檔案是否存在
         if not os.path.exists(source_path):
@@ -44,6 +45,11 @@ def unzip_folder(source_path: str, target_path: str) -> str:
                     except Exception as e:
                         logging.warning(f"解壓縮檔案 {file_info.filename} 時發生錯誤：{str(e)}")
                         continue
+
+        elif source_path.lower().endswith('.7z'): # 新增對 .7z 的處理
+            with py7zr.SevenZipFile(source_path, 'r') as z_ref:
+                z_ref.extractall(path=target_path)
+
         else:
             return f"錯誤：不支援的檔案格式 {os.path.splitext(source_path)[1]}"
         
@@ -88,3 +94,4 @@ def write_grading_report(student_id: str, student_name: str, score: int, comment
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
+    #unzip_folder("C:\\Users\\andy\\Desktop\\C語言助教\\teach_assistant\\assignments\\graded_homework\\112368535_林哲宇\\112368535_112368535_HW01_WEEK01.zip", "C:\\Users\\andy\\Desktop\\C語言助教\\teach_assistant\\assignments\\graded_homework\\112368535_林哲宇\\112368535_112368535_HW01_WEEK01")

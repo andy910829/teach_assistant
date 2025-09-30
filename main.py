@@ -40,6 +40,9 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
     # 讀取學生的程式碼
     c_files = []
     h_files = []
+    zip_files = []
+    py_files = []
+    cpp_files = []
     other_files = []
     file_structure = []
     for root, dirs, files in os.walk(student_folder_path):
@@ -54,6 +57,8 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
             
         # 添加檔案資訊
         for file_name in files:
+            if file_name.endswith('.zip') or file_name.endswith('.rar') or file_name.endswith('.tar') or file_name.endswith('.7z'):
+                zip_files.append(file_name)
             file_path = os.path.join(rel_path, file_name)
             file_structure.append(f"📄 {file_path}")
             
@@ -66,6 +71,11 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
                         c_files.append(content)
                     elif file_name.endswith('.h'):
                         h_files.append(content)
+                    elif file_name.endswith('.cpp'):
+                        cpp_files.append(content)
+
+                    elif file_name.endswith('.py'):
+                        py_files.append(content)
                     else:
                         other_files.append(f"檔案：{file_path}\n內容：\n{content}\n")
             except UnicodeDecodeError:
@@ -73,7 +83,8 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
                 other_files.append(f"檔案：{file_path} (二進位檔案)")
             except Exception as e:
                 other_files.append(f"檔案：{file_path} (無法讀取：{str(e)})")
-    
+    if not c_files and not h_files and not cpp_files and not py_files and not zip_files:
+        return "STOP"
     # if not c_files and not h_files:
     #     error_msg = "找不到 .c 或 .h 檔案"
     #     await mcp_client.call_tool("write_grading_report", {
@@ -96,13 +107,17 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
 
 程式碼：
 """    
-    if not c_files and not h_files:
-        prompt += f"無程式碼提供，請根據檔案結構判斷是否需要解壓縮，解壓縮檔案路徑為{os.path.join(student_folder_path)}  加上您需要解壓縮的檔名。請將該檔案的解壓縮目標設置為{os.path.join(student_folder_path)} "
+    if not c_files and not h_files and not cpp_files:
+        prompt += f"無程式碼提供，請根據檔案結構判斷是否需要解壓縮，解壓縮檔案路徑為:{os.path.join(student_folder_path)}，將上述路徑加上要解壓縮的資料夾檔名才是完整的解壓縮路徑，請將該路徑設置為source_path。並且將該檔案的解壓縮目標設置為{os.path.join(student_folder_path)}加上解壓縮後你希望該資料夾命名的名稱，才是完整的target_path"
     else:
         if c_files:
             prompt += "\nC 檔案：\n" + "\n---\n".join(c_files)
+        if cpp_files:
+            prompt += "\nCPP 檔案：\n" + "\n---\n".join(cpp_files)
         if h_files:
             prompt += "\n\n標頭檔：\n" + "\n---\n".join(h_files)
+        if py_files:
+            prompt += "\n\nPython 檔案：\n" + "\n".join(py_files)
     prompt += f"""
 
 評分標準：
@@ -110,13 +125,13 @@ async def grade_single_student(student_folder_path: str, model: AgentGemini, mcp
 
 請根據評分標準評分，並使用 write_grading_report 工具生成評分報告。
 評分報告應包含：
-1. 分數（0-100）
+1. 分數（70-100）
 2. 詳細評語
 3. 改進建議
 
 請確保評分報告的輸出路徑為：{os.path.join(student_folder_path, "grading_report.txt")}
 """
-    print(f"Prompt: {prompt}")
+    print(f"{student_folder_path}作業批改中....")
     with open("prompt.txt", 'w', encoding='utf-8') as f:
         f.write(prompt)
     # 生成評分
@@ -145,7 +160,7 @@ async def main():
     """主執行函數"""
     # 使用絕對路徑
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    homework_zip_file = os.path.join(current_dir, "hw100034936.zip")
+    homework_zip_file = os.path.join(current_dir, "hw100038106.zip")
     unzip_target_dir = os.path.join(current_dir, "assignments", "graded_homework")
 
     print("--- C語言助教 Agent ---")
@@ -187,13 +202,16 @@ async def main():
     # 遍歷所有學生資料夾
     for student_dir_name in os.listdir(main_homework_folder):
         student_folder_path = os.path.join(main_homework_folder, student_dir_name)
-        
         # 如果是目錄，直接處理
         if os.path.isdir(student_folder_path):
             result = await grade_single_student(student_folder_path, model, mcp_client)
+            if result == 'STOP':
+                print(f"{student_folder_path}作業批改完畢。")
+                continue
             while True:
                 result = await grade_single_student(student_folder_path, model, mcp_client)
                 if result == 'STOP':
+                    print(f"{student_folder_path}作業批改完畢。")
                     break
         # 如果是壓縮檔，先解壓縮再處理
         elif student_dir_name.endswith(('.zip', '.rar')):

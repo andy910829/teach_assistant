@@ -3,3 +3,4 @@ python-dotenv
 rarfile
 mcp[cli]
 pydantic>=2.0.0
+py7zr 

@@ -69,8 +69,8 @@ class AgentGemini:
         )
         
         # 檢查是否有函數調用
-        print("================== GEMINI response ==================")
-        print(response.candidates[0])
+        # print("================== GEMINI response ==================")
+        # print(response.candidates[0])
         # print(response)
 
         max_try = 3
