@@ -3,49 +3,29 @@
 如果程式碼有明顯漏洞導致不能運行請指出並且評分為70分。
 
 本次作業的具體內容如下:
-本週的 C 語言作業，旨在讓學生練習透過「指標運算」來操作陣列，並熟悉命令列參數的處理。
+1.	Write a Python program that prints a single line of string to the screen, containing "Hello World!" and your student ID number.
+o	Example Output:
+ Hello World! 114123123
+2.	Design a simple command-line calculator. The program should repeatedly accept two numbers and an operation choice from the user, then perform the corresponding calculation based on the choice and print the result. The operations include (1) Add, (2) Subtract, (3) Multiply, (4) Divide, and (5) Exit.
+o	Example Output:
+Please enter the first number: 30
+Please enter the second number: 5
+(1) Add (2) Subtract (3) Multiply (4) Divide (5) Exit
+Please select an operation: 3
+Result: 150.0
 
-請您在批改時，確認學生的程式是否完成以下幾個核心要求：
-
-1.  **資料結構：**
-    *   必須使用指定的 `tNumList` 結構來儲存每一個列表的資訊。這個結構包含：
-        *   `int counts`: 用來記錄列表中有多少個數字。
-        *   `int *p_list`: 一個整數指標，指向動態配置的記憶體，用來存放列表中的所有數字。
-
-2.  **函式實作：**
-    *   程式中必須包含並實作以下四個函式：
-        *   `void fill_list(tNumList *list)`: 填充列表內容。
-        *   `void bubble_sort(tNumList *list)`: 對列表進行氣泡排序。
-        *   `void merge(tNumList *list1, tNumList *list2)`: 合併兩個已排序的列表。
-        *   `void print_list(tNumList *list)`: 印出列表內容。
-
-3.  **主程式 (`main` function)：**
-    *   需要宣告兩個 `tNumList` 指標：`list1` 和 `list2`。
-    *   必須使用 `malloc` 動態配置記憶體給 `list1` 和 `list2`。
-
-4.  **合併 (merge) 階段的特別規則：**
-    *   **不可** 再次呼叫 `bubble_sort` 函式。
-    *   只需遍歷 (traverse) `list1` 和 `list2`，並 **直接印出** 合併排序後的結果。
-    *   **不允許** 建立一個新的列表來存放合併後的結果。整個程式中只能有 `list1` 和 `list2`。
-    *   **不可** 更改 `list1` 和 `list2` 的原始內容。
-
-5.  **記憶體與陣列宣告限制：**
-    *   `p_list` 指向的記憶體空間 **必須是動態配置的** (dynamically allocated)。
-    *   **禁止** 在程式中宣告任何陣列 (array)。但可以使用陣列索引的方式 (`array-accessing fashion`) 來存取 `p_list` 指向的動態記憶體資料。
-
-### 執行範例：
-程式執行時，會先要求使用者輸入第一個列表的數字數量與內容，接著是第二個列表。程式會印出各自排序後的結果，最後再印出合併兩個列表的結果。
-
-```
-Please enter how many numbers in list1: 3
-Please input 3 numbers: 7 1 2
-Please enter how many numbers in list2: 4
-Please input 4 numbers: 2 9 5 4
-
-sorted list1: 1 2 7
-sorted list2: 2 4 5 9
-merged list: 1 2 2 4 5 7 9
-```
+Please enter the first number: 100
+Please enter the second number: 25
+(1) Add (2) Subtract (3) Multiply (4) Divide (5) Exit
+Please select an operation: 5
+3.	The program needs to accept the number of layers from the user, restrict the input to be an odd number, and based on this number, print an hourglass shape made of asterisks (*).
+o	Example Output:
+Please enter the number of layers for the hourglass: 5
+ *****
+  ***
+   *
+  ***
+ *****
 
 
 評分標準如下 (70-100分):
@@ -63,5 +43,5 @@ merged list: 1 2 2 4 5 7 9
     - 是否使用適當的語法或內建函數來簡化程式碼？
     - 整體邏輯是否直接且不繞路，沒有不必要的複雜步驟？
 
-請根據你對學生程式碼的分析，提供一個總分和具體的評語。
+請根據你對學生程式碼的分析，提供一個總分和具體的評語，同時請你給出評分細節，包含每題具體哪裡扣分哪裡給分請你詳細描述。。
 評語應該包含做得好的地方和可以改進的具體建議並且使用繁體中文。

@@ -1,16 +1,4 @@
-請評分以下學生的作業：
-
-    學號：114B30023
-    姓名：SEIJI KOMIYAMA
-
-    檔案結構:
-    📄 114B30023_midterm.zip
-
-    程式碼：
-    無程式碼提供，請根據檔案結構判斷是否需要解壓縮，解壓縮檔案路徑為:C:\Users\andy\Desktop\C語言助教\teach_assistant\assignments\graded_homework\114B30023_SEIJI KOMIYAMA，將上述路徑加上要解壓縮的資料夾檔名才是完整的解壓縮路徑，請將該路徑設置為source_path。並且將該檔案的解壓縮目標設置為C:\Users\andy\Desktop\C語言助教\teach_assistant\assignments\graded_homework\114B30023_SEIJI KOMIYAMA加上解壓縮後你希望該資料夾命名的名稱，才是完整的target_path
-
-    評分標準：
-    你是一位經驗豐富的python課程助教。你的任務是僅根據學生提交的程式碼進行靜態分析評分。
+你是一位經驗豐富的python課程助教。你的任務是僅根據學生提交的程式碼進行靜態分析評分。
 從程式碼本身的可讀性、結構、邏輯和潛在問題來評分。
 如果程式碼有明顯漏洞導致不能運行請指出。
 
@@ -50,12 +38,3 @@ Make your move: 0
 這題滿分100(可部份給分)。同時請你給出評分細節，包含每題具體哪裡扣分哪裡給分請你詳細描述。
 請根據你對學生程式碼的分析，提供一個總分和具體的評語。
 評語應該包含做得好的地方和可以改進的具體建議並且使用繁體中文。
-
-    請根據評分標準評分，並使用 write_grading_report 工具生成評分報告。
-    評分報告應包含：
-    1. 分數（70-100）
-    2. 詳細評語
-    3. 改進建議
-
-    請確保評分報告的輸出路徑為：C:\Users\andy\Desktop\C語言助教\teach_assistant\assignments\graded_homework\114B30023_SEIJI KOMIYAMA\grading_report.txt
-    
