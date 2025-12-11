@@ -1,6 +1,7 @@
 google-generativeai 
 python-dotenv
 rarfile
+ollama
 mcp[cli]
 pydantic>=2.0.0
 py7zr 

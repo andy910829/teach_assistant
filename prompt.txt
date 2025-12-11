@@ -1,61 +1,832 @@
 請評分以下學生的作業：
 
-    學號：114B30023
-    姓名：SEIJI KOMIYAMA
+            學號：114C73032
+            姓名：王界棠
 
-    檔案結構:
-    📄 114B30023_midterm.zip
+            檔案結構:
+            📁 114C73032_w13/
+📄 114C73032_w13.zip
+📄 114C73032_w13\main.c
+📄 114C73032_w13\main.h
+📄 114C73032_w13\makefile
+📄 114C73032_w13\queue.c
+📄 114C73032_w13\queue.h
+📄 114C73032_w13\space.c
+📄 114C73032_w13\space.h
 
-    程式碼：
-    無程式碼提供，請根據檔案結構判斷是否需要解壓縮，解壓縮檔案路徑為:C:\Users\andy\Desktop\C語言助教\teach_assistant\assignments\graded_homework\114B30023_SEIJI KOMIYAMA，將上述路徑加上要解壓縮的資料夾檔名才是完整的解壓縮路徑，請將該路徑設置為source_path。並且將該檔案的解壓縮目標設置為C:\Users\andy\Desktop\C語言助教\teach_assistant\assignments\graded_homework\114B30023_SEIJI KOMIYAMA加上解壓縮後你希望該資料夾命名的名稱，才是完整的target_path
+            程式碼：
+            
+C 檔案：
+#include "main.h"
+#include "queue.h"
+#include "space.h"
 
-    評分標準：
-    你是一位經驗豐富的python課程助教。你的任務是僅根據學生提交的程式碼進行靜態分析評分。
+int main(void)
+{
+    tQueue *queue = NULL;
+    int operation = 0;
+
+    tQueueNode *target_node = NULL;
+    int id = 0, score = 0, ret = 0;
+
+    queue = createQueue();
+    // 這邊會接 函數傳出來的空間門牌
+
+    while (1)
+    {
+
+        printf("\nWhich type you are going to operate? \n");
+        printf("1. Add a small item\n");
+        printf("2. Add a big item\n");
+        printf("3. Remove a small item with a specific Id\n");
+        printf("4. Remove a big item with a specific Id\n");
+
+        scanf("%d", &operation);
+        //
+        if (operation == 1 || operation == 2)
+        {
+            printf("  Enter id: \n");
+            scanf("%d", &id);
+            printf(" Enter score: \n");
+            scanf("%d" ,&score);
+
+            ret = enqueue_node(queue, id, score, (operation == 1 ? TYPE_SMALL : TYPE_LARGE));
+            // 若等於 1 則資料是小資料 , 否則是大資料
+
+            if (ret == 0)
+            {
+                printf("    Cannot enter to the queue\n");
+            }
+
+            print_buffer_status();
+            // 印出 目前 buffer 狀態
+        }
+        else if (operation == 3 || operation == 4)
+        {
+            printf("  Enter an ID to remove ");
+
+            scanf("%d", &id);
+
+            target_node = find_target_node(queue, id, (operation == 3 ? TYPE_SMALL : TYPE_LARGE));
+            // 如果 輸入等於3時 則傳入TYPE_SMALL 否則 傳入 TYPE_LARGE
+            // 後面是這個函數要輸入的參數
+
+            if (target_node == NULL)
+            {
+                printf("    Cannot find the target node \n");
+            }
+
+            else
+
+            {
+                dequeue_node(queue, target_node, (operation == 3 ? TYPE_SMALL : TYPE_LARGE));
+                // 如果 輸入等於3時 則傳入TYPE_SMALL 否則 傳入 TYPE_LARGE
+            }
+            print_buffer_status();
+        }
+
+        else
+
+        {
+            printf("    No such operation \n");
+        }
+        print_queue(queue);
+    }
+}
+
+---
+#include "queue.h"
+#include "space.h"
+
+/*這邊是在做生產空間*/
+tQueue *createQueue(void) // 這邊就是出一個管理的頭
+{
+    tQueue *queue;
+    queue = (tQueue *)malloc(sizeof(tQueue));
+    //  malloc 建立一個 頭的管理房間
+    //  生產中心建立
+
+    if (queue != NULL) // 如果創好,就裡面初始化
+    {
+        queue->front = NULL;
+        queue->rear = NULL;
+        queue->count = 0;
+
+        return queue;
+    }
+    else
+    {
+        printf("The Queue Build is fail");
+        return NULL;
+    }
+}
+
+/*加入序列 領料 入庫*/
+int enqueue_node(tQueue *queue, int id, int score, int data_type)
+{
+
+    tQueueNode* node = (tQueueNode*)malloc(sizeof(tQueueNode));     // 先創一個對應的節點取貨
+    if(node == NULL)
+    {
+        printf("Error from enqueue_node function \n");
+        printf("The node create is fail !! \n");
+        return 0;
+    }
+
+
+    void* content = NULL;    // 萬用字元,萬用空間 (實做在轉換)
+    int mem_location = -1;     // 這個是在標示哪格空間可以被做使用
+    int from_small = 0;
+
+    /*回傳裝好內容的東西與對應東西的門牌*/
+    our_malloc(data_type, &content, &mem_location,&from_small);
+    // ** &直接綁 newptr 與 取 mem_location
+
+    if (content == NULL || mem_location == -1)
+    {
+        printf("    Enqueue False!!! \n");
+        return 0;
+    }
+
+    else    /*進行對應實做*/
+    {
+        // 這邊先將node 房間中的 content 放入對應的content
+        node->type = data_type;
+
+        if (node->type == TYPE_SMALL) // 這邊是對buffer 空間的資料結構進行操作
+        {
+            tQueueSmall* item = (tQueueSmall*)content;
+    
+            /*這段是在處理buffer裡面的內容*/
+            item->id = id;
+            item->location = mem_location;
+            item->score = score;
+
+            /*接上buffer*/
+            node->content = content;
+
+        }
+
+        if(data_type == TYPE_LARGE)
+        {
+            tQueueLarge* item = (tQueueLarge*)content;
+
+            /*這段是在處理buffer裡面的內容*/
+            item->id = id;
+            item->location = mem_location;
+            item->score[0] = score;
+            // 暫時寫0,之後要再修改
+
+             /*接上buffer*/
+            node->content = content;
+            node->from_small = from_small; //use the small area?
+
+        }
+
+
+        /*鏈結串列實做*/
+        if(queue->count ==0)
+        {
+            queue->front = node;
+            queue->rear = node;
+            node->next = NULL;
+            node->prev = NULL; 
+        }
+        else /*這邊是以新建的node為主*/
+        {
+            node->prev = queue->rear;
+            node->next = NULL;
+            queue->rear->next =node;
+            // == 上一個node 的 next 接到目前的node
+            queue->rear = node;
+            // 目前的尾更新成現在新創的node
+        }
+        queue->count++;
+        return 1;
+    }
+}
+
+/*移除序列 node*/
+void dequeue_node(tQueue *queue, tQueueNode *target, int data_type)
+{
+    /* 安全邊界檢查*/
+    if (queue->count == 0 || target == NULL)
+    {
+        return;
+    }
+
+    else if (queue->count == 1) // 最後一個節點 else if ->全部都是在處理例外情況
+    {
+        queue->front = NULL; // 將頭尾直接指空
+        queue->rear = NULL;
+    }
+
+    else if (target == queue->front && queue->front != NULL) // 目標的記憶體位置與頭的記憶體位置喔一樣
+    {
+        queue->front = target->next; // 將頭更新成目標節點的下一個
+        queue->front->prev = NULL;
+    }
+
+    else if (target == queue->rear && queue->rear != NULL)
+    {
+        queue->rear = target->prev;
+        // 將尾巴更新成 目標節點的上一個
+        queue->rear->next = NULL; // 將尾巴的下個節點 更新成空的
+    }
+
+    else // 中間
+    {
+        target->prev->next = target->next; // 將上一個節點的 下一個節點 連接的對象更新成 下一個
+        target->next->prev = target->prev;
+    }
+
+    /*用於清空 靜態空間中的內容*/
+    int location = 0;
+    if (data_type == TYPE_SMALL)
+    {
+        tQueueSmall* item = (tQueueSmall*)target->content;
+        // 指到小空間的內容物
+        location = item->location;
+        our_free(TYPE_SMALL , location , target->from_small);
+
+    }
+    else if(data_type == TYPE_LARGE && target->from_small==1)
+    {
+        tQueueSmall* item = (tQueueSmall*)target->content;
+        location = item->location;
+        our_free(TYPE_LARGE,location,target->from_small);
+    }
+    else
+    {
+        tQueueLarge* item = (tQueueLarge*) target->content;
+        location = item->location;
+        our_free(TYPE_LARGE,location,target->from_small);
+    }
+
+    free(target);
+    queue->count--; // 減掉一個
+}
+
+/*找節點*/
+tQueueNode *find_target_node(tQueue *queue, int id, int data_type)
+{
+    if (queue == NULL || queue->count == 0)
+    {
+        return NULL;
+    }
+
+    tQueueNode *currentNode = queue->front; // 先從頭 開始搜尋
+    if (currentNode==NULL)
+    {
+        printf("Error from find_target_node \n ");
+        printf("The queue front is empty !!");
+
+        return NULL;
+    }
+
+    int i = 0;
+    for (i; i < queue->count; i++)
+    {
+        if(currentNode->type != data_type) //先稽查資料類型
+        {
+            currentNode = currentNode->next;
+            continue;
+        }
+        else
+        {
+            tQueueLarge* item = (tQueueLarge*)currentNode->content;
+            if (item->id == id)
+            {
+                return currentNode;
+                // 回傳目前node 的 記憶體門牌
+            }
+        }
+
+        currentNode = currentNode->next;
+       
+    }
+    return NULL;
+}
+
+void print_queue(tQueue *queue)
+{
+    int i = 0 , id = 0 , score = 0 , location = 0 ;
+    char nodetype = '0';
+
+    tQueueNode *target = queue->front;
+
+    printf(" type mixed queue: \n "); //印出 content 內容
+
+    for (i; i < queue->count; i++)
+    {
+        if(target->type == TYPE_SMALL)
+        {
+            tQueueSmall* item = (tQueueSmall*)target->content;
+            // 抽去對應節點的 空間內容物
+            id = item->id;
+            score = item->score;
+            location = item->location;
+            nodetype = 'S'; //samll
+        }
+        else if (target->type == TYPE_LARGE && target->from_small == 1)
+        {
+            tQueueLarge* item = (tQueueLarge*)target->content;
+            id = item->id;
+            score = item->score[0];
+            location = item->location;
+            nodetype = 'M'; //mix
+        }
+        else
+        {
+            tQueueLarge* item = (tQueueLarge*)target->content;
+            id = item->id;
+            score = item->score[0];
+            location = item->location;
+            nodetype = 'L';
+            
+        }
+        printf("\n");
+
+        printf("%d,%d ,%c,%d \n",id,score,nodetype,location);
+
+        target = target->next; // 更新至下個節點的位置
+
+        printf("\n");
+    }
+
+     printf("\n");
+}
+
+   
+
+
+---
+#include "space.h"
+
+/* space 函式內建參數*/
+unsigned char buffer[(NUM_SMALL_BYTE_BUF * SMALL_ELEMENT_SIZE) + (NUM_LARGE_BYTE_BUF * LARGE_ELEMENT_SIZE)];
+// 總共 768 byte 空間
+unsigned char byte_large_buf_mask = 0; // 這邊是面罩
+unsigned char byte_small_buf_mask = 0;
+/* space 函式內建參數*/
+
+
+void print_buffer_status(void)
+{
+    int i = 0;
+    unsigned char mask = 0x80;
+    // 8 bit 大小
+    printf(" The small buffer mask  : ");
+    for (i; i < 8; i++)
+    {
+       
+        printf("%d" ,(byte_small_buf_mask & mask) >> (7 - i)); 
+
+        mask = mask >> 1;
+        // 往後推一個 並且更新面罩的位置
+    }
+    printf("\n");
+    printf(" The larger buffer mask :");
+
+    /*因為是在同一隻程式中,請記得把 i 和 mask 還原成原本的樣子*/
+    mask = 0x80;
+    for (i=0; i < 8; i++)
+    {
+       
+        printf("%d" , (byte_large_buf_mask & mask) >> (7 - i));
+        // 往後推出去
+        mask = mask >> 1;
+        // 往後推一個 並且更新面罩的位置
+    }
+
+    printf("\n");
+}
+
+void our_malloc(int type, void** target, int* mem_location , int* from_small)
+// 這邊要幫忙找位置
+{
+    int index = 0;
+
+    if (type == TYPE_SMALL)
+    {
+        index = test_single_location();
+        if(index == -1)
+        {
+            printf("The error from our_malloc \n");
+            printf("The sapce is full \n");
+            *target = NULL;
+            *mem_location = -1;
+            return;
+        }
+        else
+        {
+            *target = (void*) &(buffer[index*SMALL_ELEMENT_SIZE]);
+            /* 這邊是在做三件事
+            / 先指定目前buffer的資料型態是萬用的 
+            /  &->對後面的() 裡面算出來的 empty queue space 進行取址
+            /  [index * SMALL_ELEMENT_SIZE] 進行標準位移計算
+            */
+            set_single_bit(index);
+            *mem_location = index; // 將mem_location 指標內容填入 index
+            
+        }
+
+    }
+
+    if(type == TYPE_LARGE)
+    {
+        index = test_dual_location();
+        if(index != -1)
+        {
+            *from_small = 0;
+            *target = (void*) &(buffer[LARGE_START + (index * LARGE_ELEMENT_SIZE)]);
+         /* 這邊是在做三件事
+         / 先指定目前buffer的資料型態是萬用的 
+         /  &->對後面的() 裡面算出來的 empty queue space 進行取址
+         /  [index * SMALL_ELEMENT_SIZE] 進行標準位移計算
+        */
+             set_dual_bit(index);
+            *mem_location = index; // 將mem_location 指標內容填入 index
+        }
+        else // use the small space
+        {
+            index = find_two_small_location();
+            *from_small = 1;
+
+            if (index == -1)
+            {
+                printf("The error from our_malloc \n");
+                printf("The sapce is full \n");
+                *from_small = 0;
+                *target = NULL;
+                *mem_location = -1;
+                return;
+            } 
+                          
+            *target = (void*)  &(buffer[index*SMALL_ELEMENT_SIZE]); // 這邊因為是small element 的區域,因此要在後面乘 SMALL_ELEMENT_SIZE
+             set_single_bit(index);
+             set_single_bit(index + 1);
+
+            *mem_location = index;
+        }
+    }
+}
+
+int test_single_location(void) // large space
+{
+    int i = 0;
+    unsigned char mask = 0x01; // 這邊製作 mask 進行比對
+
+    for (i; i < NUM_SMALL_BYTE_BUF; i++) // 遍歷尋找 index
+    {
+        if((byte_small_buf_mask & mask) == 0)
+        {
+            return i;
+        }
+
+        else
+        {
+            mask = mask << 1; // 向右移一位 ,找下個位置
+                              // mask 就如同手電筒 如果 00000001 有空的 就回傳
+                              // 如果沒有 就 往右推 00000010 (也就是將mask 往右推)
+        }
+    }
+
+    return -1;
+}
+
+
+void set_single_bit(int location) // 這邊目前改更新 小面罩
+
+{
+    unsigned char mask = 0x01; // 從最右邊的 bit 開始
+    mask = mask << location;  // 將1往左推幾次才會成為我的新的mask
+    byte_small_buf_mask = byte_small_buf_mask | mask;
+    //  這邊用來更新 byte_buf_mask -> 也就是反應有哪幾個地方已經被佔了
+}
+
+int test_dual_location()
+{
+    int i = 0;
+    unsigned char mask = 0x03; // 這邊製作 mask 進行比對
+                               // 3 = 00000011
+
+    for (i; i < NUM_LARGE_BYTE_BUF - 1; i++) // 因為最終點 7 ,而且 mask是兩個 ,因此要設定在6
+    {
+        if ((byte_large_buf_mask & mask) == 0) // 這邊的 byte buf mask 是一個固定空間
+                                              // 若為空 就回傳對應空間的index值
+        {
+            return i; // 只能回傳一個數字 c語言 只能回傳一個
+        }
+
+        else
+        {
+            mask = mask << 1; // 向左移一位 ,找下個位置
+                              // mask 就如同手電筒 如果 00000001 有空的 就回傳
+                              // 如果沒有 就 往右推 00000010
+        }
+    }
+
+    return -1;
+}
+
+int find_two_small_location(void)
+{
+    int i = 0;
+    unsigned char mask = 0x03;
+    
+    for(i=0 ; i < NUM_SMALL_BYTE_BUF;i++) //這邊是掃小單元區
+    {
+        if ((byte_small_buf_mask & mask) == 0)
+        {
+            return i;
+        }
+        else 
+        {
+            mask = mask << 1;
+        }
+    }
+
+    return -1; // The space is all empty
+}
+
+
+
+void set_dual_bit(int location)
+{
+    unsigned char mask = 0x03;
+
+    mask = mask << location; // 真因 mask 忘記偏移
+
+    byte_large_buf_mask = byte_large_buf_mask | mask;
+    //  這邊用來更新 byte_buf_mask -> 也就是反應有哪幾個地方已經被佔了
+    // | = 0 1 =11
+}
+
+void clear_single_bit(int location)
+{
+
+    byte_small_buf_mask &= ~(1 << location);
+    //  這邊用來更新 byte_buf_mask -> 也就是反應有哪幾個地方已經被佔了
+    // a &= b a = a&b
+    // a += b a = a+b
+    // "~" {0 -> 1 ; 1-> 0} //Reverse
+}
+
+void clear_dual_bit(int location)
+{
+    byte_large_buf_mask &= ~(0x03 << location);
+    //  這邊用來更新 byte_buf_mask -> 也就是反應有哪幾個地方已經被佔了
+}
+
+void our_free(int type, int mem_location,int from_small)
+{
+    if (mem_location < 0)
+    {
+        return;
+    }
+
+    if (type == TYPE_SMALL)
+    {
+        clear_single_bit(mem_location);
+    }
+
+    else if(type == TYPE_LARGE && from_small ==1)
+    {
+        clear_dual_bit(mem_location);
+    }
+    else
+    {
+        clear_dual_bit(mem_location);
+    }
+}
+
+
+標頭檔：
+#ifndef __MAIN__
+#define __MAIN__
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TYPE_SMALL              0
+#define TYPE_LARGE              1
+
+// 這邊 def 文本 是用巨集的方式 弄
+
+#endif
+---
+#ifndef __QUEUE__
+#define __QUEUE__
+
+
+typedef struct type_small
+{
+    int id;
+    int location;
+    int score;
+
+}tQueueSmall;
+
+
+typedef struct type_large /* 這一個 資料結構是給 buffer用的 */
+{
+    int id;
+    int location;
+    int score[8];
+    
+}tQueueLarge;
+
+
+typedef struct node_info /* 這一個 資料結構是給 buffer用的 */
+{
+    int type;
+    void* content; // 這邊是萬用字元,指向對應的queue
+    int from_small;
+    struct node_info* next;
+    struct node_info* prev;
+
+}tQueueNode;
+
+
+
+
+typedef struct
+{
+    tQueueNode *front;
+    tQueueNode *rear;
+    int count;
+
+} tQueue;
+
+/*The function*/
+tQueue *createQueue(void);
+
+int enqueue_node(tQueue *queue, int id, int score, int data_type);
+
+void dequeue_node(tQueue *queue, tQueueNode *target, int data_type);
+
+tQueueNode *find_target_node(tQueue *queue, int id, int data_type);
+
+void print_queue(tQueue *queue);
+
+#endif
+---
+#ifndef __SPACE__
+#define __SPACE__
+
+#include "main.h" // code 裡面有用到 主函式的變數
+
+#define NUM_SMALL_BYTE_BUF 8
+// 8 bit 大小 我的面罩
+#define NUM_LARGE_BYTE_BUF 8
+
+#define SMALL_ELEMENT_SIZE 32
+// 一個小空間 4個BYTE
+#define LARGE_ELEMENT_SIZE 64
+// 一個大空間 8個byte
+
+#define LARGE_START (NUM_SMALL_BYTE_BUF * SMALL_ELEMENT_SIZE)
+// 這邊要先將small 總區域算出,並基於此區域往上疊加
+
+void print_buffer_status(void);
+void our_malloc(int type, void **target, int *mem_location , int* from_small);
+void our_free(int type, int mem_location,int from_small);
+int test_single_location();
+void set_single_bit(int location);
+int test_dual_location();
+int find_two_small_location(void);
+void set_dual_bit(int location);
+void clear_single_bit(int location);
+void clear_dual_bit(int location);
+
+#endif
+
+Makefile 檔案：
+檔案：114C73032_w13\makefile
+內容：
+CC = gcc
+
+
+OBJ = space.o queue.o main.o
+EXE = run.exe
+
+all: $(EXE)
+.c.o: ; $(CC) -c $*.c
+
+$(EXE): $(OBJ)
+	$(CC) -o $@ $(OBJ)
+
+clean:
+	del /f /q $(EXE) $(OBJ)
+
+
+
+            評分標準：
+            你是一位經驗豐富的 C 語言課程助教。你的任務是評分學生提交的程式碼，並**務必使用提供的工具**來執行解壓縮與寫入評分報告的動作。
+
+### **【工具使用指南 (重要)】**
+你擁有以下工具，請在適當的時機調用它們，不要只在對話中輸出結果**必須調用tool_calls**：
+
+1.  **`unzip_folder(source_path, target_path)`**
+    *   **時機**：當你發現學生的作業是 `.zip`, `.rar` 或 `.7z` 格式，且尚未解壓縮時。
+    *   **注意**：如果有巢狀壓縮檔（壓縮檔內還有壓縮檔），請多次調用此工具直到獲得原始碼。
+
+2.  **`write_grading_report(student_id, student_name, score, comments, output_path)`**
+    *   **時機**：評分完成後，**必須**調用此工具來儲存結果。
+    *   **參數說明**：
+        *   `student_id`：從資料夾名稱或檔名解析出的學號。
+        *   `student_name`：從資料夾名稱或檔名解析出的姓名。
+        *   `score`：根據評分標準給出的總分 (70-100)。
+        *   `comments`：詳細的評語與改進建議（繁體中文）。
+        *   `output_path`：報告輸出的完整路徑（通常是 `student_folder_path/grading_report.txt`）。
+    *   **限制**：你的任務結束標誌是成功調用此工具，請勿只將評語輸出在對話框中。
+
+---
+
+### **【執行流程】**
+1.  **檢查檔案結構**：確認是否需要解壓縮。如果需要，**立刻調用 `unzip_folder`**。
+2.  **靜態分析**：閱讀原始碼（`.c`, `.h`），根據下方的「作業內容」與「評分標準」進行分析。
+3.  **計算分數**：根據可讀性、結構、精簡度三個面向打分。
+4.  **生成報告**：整理評語，**調用 `write_grading_report`** 結束任務。
+
+---。
+
 從程式碼本身的可讀性、結構、邏輯和潛在問題來評分。
-如果程式碼有明顯漏洞導致不能運行請指出。
+如果程式碼有明顯漏洞導致不能運行請指出並且評分為70分。
 
 本次作業的具體內容如下:
-Write a Rock-Paper-Scissors game to play against the computer. The program should be able to repeatedly accept user input.
-o	Requirements:
-A. First, you need to import the random module.
-B. Define the correspondence for the player's and computer's moves, for example: 1 for "Scissors", 2 for "Rock", and 3 for "Paper".
-C. Prompt the player to choose a number from 1, 2, or 3 to make a move.
-D. Use random.randint(1, 3) to make the computer choose a random move.
-E. Determine the winner based on the game rules (Rock beats Scissors, Scissors beats Paper, Paper beats Rock).
-F. Print both the "Player's move" and the "Computer's move" to the screen.
-G. Finally, clearly print the result: "You win!", "You lose!", or "It's a tie!".
-o	Example Output:
-(1) Scissors (2) Rock (3) Paper (Enter any other number to exit)
-Make your move: 2
-You played: Rock
-Computer played: Scissors
-Result: You win!
+本次作業是 Week 11 的進階延伸。你需要修改原本的佇列程式，使其成為一個「通用容器 (Universal Container)」，能夠同時儲存與管理兩種不同類型的資料結構（Small 與 Large）。
 
-(1) Scissors (2) Rock (3) Paper (Enter any other number to exit)
-Make your move: 1
-You played: Scissors
-Computer played: Scissors
-Result: It's a tie!
+### **1. 核心技術要求**
+*   **多型實作 (`void *`)**：
+    *   利用 C 語言的 `void *` 指標技術來達成多型。
+    *   佇列節點 (`tQueueNode`) 不再儲存具體的數據，而是透過一個 `void *content` 指標，指向實際存放資料的記憶體位址。
+    *   在存取或列印資料時，必須根據節點的 `type` 標記，將 `void *` 強制轉型回正確的結構 (`tQueueSmall` 或 `tQueueLarge`)。
 
-(1) Scissors (2) Rock (3) Paper (Enter any other number to exit)
-Make your move: 3
-You played: Paper
-Computer played: Rock
-Result: You win! 
+### **2. 硬性限制 (Constraints)**
+*   **Malloc 次數限制**：整個程式最多只能呼叫 **2 次** `malloc`。
+    *   這意味著你**不能**對每個新進來的節點呼叫 `malloc`。
+    *   所有資料內容必須存放在全域的 `buffer` 中。
+*   **記憶體管理 (Memory Management)**：
+    *   必須延續使用 **位元運算 (Bitwise Operation)** 來管理記憶體。
+    *   **全域 Buffer 分區**：`buffer` 被邏輯上分為兩區（Small 區與 Large 區），你需要分別維護兩個位元遮罩 (Bitmask) 來追蹤這兩區的使用狀態：
+        *   `byte_small_buf_mask`：管理 Small 類型的空間。
+        *   `byte_large_buf_mask`：管理 Large 類型的空間。
 
-(1) Scissors (2) Rock (3) Paper (Enter any other number to exit)
-Make your move: 0
+### **3. 資料結構定義**
+你需要定義以下結構：
+
+*   **Type 1 (Small Data)**：
+    *   結構名：`tQueueSmall`
+    *   內容：`int id`, `int location`, `int score` (單一分數)。
+*   **Type 2 (Large Data)**：
+    *   結構名：`tQueueLarge`
+    *   內容：`int id`, `int location`, `int score[8]` (分數陣列)。
+*   **通用節點 (Queue Node)**：
+    *   結構名：`tQueueNode` (或 `node_info`)
+    *   內容：
+        *   `int type`：用來標記這個節點是指向 Small (1) 還是 Large (2)。
+        *   `void *content`：指向 `buffer` 中實際資料位址的通用指標。
+        *   `next`, `prev`：雙向鏈結指標。
+
+### **4. 程式功能需求**
+1.  **Enqueue (加入資料)**：
+    *   使用者選擇加入 Type 1 或 Type 2。
+    *   程式需檢查對應的 Bitmask 是否有空位。
+    *   若有空位，計算 `buffer` 中的對應位址，將資料寫入，並將節點加入佇列。
+2.  **Dequeue (移除資料)**：
+    *   使用者輸入 ID 來移除特定節點。
+    *   移除後，必須透過位元運算將對應的 Mask 標記歸零 (Reset to 0)，以釋放空間供後續使用 (Robustness)。
+3.  **Print (列印佇列)**：
+    *   遍歷佇列，依據每個節點的 `type` 正確轉型並印出內容。
+    *   範例格式：`ID,Score(Type,Location)`。
 
 
-這題滿分100(可部份給分)。同時請你給出評分細節，包含每題具體哪裡扣分哪裡給分請你詳細描述。
-請根據你對學生程式碼的分析，提供一個總分和具體的評語。
+評分標準如下 (70-100分):
+1.  **程式碼可讀性 (5分)**:
+    - 變數和函數命名是否清晰、有意義？
+    - 是否有適當的縮排和排版，使程式碼易於閱讀？
+    - 是否有適當且有幫助的註解來解釋複雜的程式碼區塊？
+
+2.  **程式碼結構與設計 (10分)**:
+    - 程式碼的邏輯是否清晰，容易理解？
+    - 是否有良好的模組化，例如將重複的程式碼封裝成函數？
+
+3.  **程式碼精簡度 (15分)(重點評分項目)**:
+    - 是否避免了重複或冗餘的程式碼？
+    - 是否使用適當的語法或內建函數來簡化程式碼？
+    - 整體邏輯是否直接且不繞路，沒有不必要的複雜步驟？
+
+請根據你對學生程式碼的分析，提供一個總分和具體的評語，同時請你給出評分細節，包含每題具體哪裡扣分哪裡給分請你詳細描述。
 評語應該包含做得好的地方和可以改進的具體建議並且使用繁體中文。
+**請開始分析。若需要解壓縮，請務必調用tool_calls；若分析完畢，請務必調用調用tool_calls並填入 `write_grading_report`以及相關變數。**
 
-    請根據評分標準評分，並使用 write_grading_report 工具生成評分報告。
-    評分報告應包含：
-    1. 分數（70-100）
-    2. 詳細評語
-    3. 改進建議
+            請根據評分標準評分，並使用 write_grading_report 工具生成評分報告。
+            評分報告應包含：
+            1. 分數（70-100）
+            2. 詳細評語
+            3. 改進建議
 
-    請確保評分報告的輸出路徑為：C:\Users\andy\Desktop\C語言助教\teach_assistant\assignments\graded_homework\114B30023_SEIJI KOMIYAMA\grading_report.txt
-    
+            請確保評分報告的輸出路徑為：C:\Users\andy\Desktop\C語言助教\teach_assistant\assignments\graded_homework\114C73032_王界棠\grading_report.txt
+            
