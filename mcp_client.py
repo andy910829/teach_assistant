@@ -2,7 +2,7 @@
 import asyncio  
 from mcp import ClientSession, StdioServerParameters  
 from mcp.client.stdio import stdio_client  
-  
+
 class MCPToolClient:  
     def __init__(self, server_script_path: str):  
         self.server_params = StdioServerParameters(  
@@ -10,6 +10,7 @@ class MCPToolClient:
             args=[server_script_path],  
             env=None,  
         )  
+        self.chat_history = 'chat_history.txt' 
       
     async def call_tool(self, tool_name: str, arguments: dict):  
         """调用MCP工具"""  
@@ -20,6 +21,8 @@ class MCPToolClient:
                   
                 # 调用工具  
                 result = await session.call_tool(tool_name, arguments)  
+                with open(self.chat_history, 'a', encoding='utf-8') as f:  
+                    f.write(f"\n工具調用結果:\n{result}\n")
                 return result  
       
     async def list_available_tools(self):  

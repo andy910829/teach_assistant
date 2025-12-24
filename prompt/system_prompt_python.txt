@@ -3,38 +3,24 @@
 如果程式碼有明顯漏洞導致不能運行請指出。
 
 本次作業的具體內容如下:
-Write a Rock-Paper-Scissors game to play against the computer. The program should be able to repeatedly accept user input.
-o	Requirements:
-A. First, you need to import the random module.
-B. Define the correspondence for the player's and computer's moves, for example: 1 for "Scissors", 2 for "Rock", and 3 for "Paper".
-C. Prompt the player to choose a number from 1, 2, or 3 to make a move.
-D. Use random.randint(1, 3) to make the computer choose a random move.
-E. Determine the winner based on the game rules (Rock beats Scissors, Scissors beats Paper, Paper beats Rock).
-F. Print both the "Player's move" and the "Computer's move" to the screen.
-G. Finally, clearly print the result: "You win!", "You lose!", or "It's a tie!".
-o	Example Output:
-(1) Scissors (2) Rock (3) Paper (Enter any other number to exit)
-Make your move: 2
-You played: Rock
-Computer played: Scissors
-Result: You win!
-
-(1) Scissors (2) Rock (3) Paper (Enter any other number to exit)
-Make your move: 1
-You played: Scissors
-Computer played: Scissors
-Result: It's a tie!
-
-(1) Scissors (2) Rock (3) Paper (Enter any other number to exit)
-Make your move: 3
-You played: Paper
-Computer played: Rock
-Result: You win! 
-
-(1) Scissors (2) Rock (3) Paper (Enter any other number to exit)
-Make your move: 0
-
+讓使用者輸入一個 3x3 的二維矩陣（九宮格數據），然後找出其中的「最大值」與「最小值」以及它們所在的「座標位置」
 
 這題滿分100(可部份給分)。同時請你給出評分細節，包含每題具體哪裡扣分哪裡給分請你詳細描述。
 請根據你對學生程式碼的分析，提供一個總分和具體的評語。
 評語應該包含做得好的地方和可以改進的具體建議並且使用繁體中文。
+**【⚠️ 異常狀況處理協議（請嚴格遵守）】**
+在評分前，請依照下列 **SOP** 檢查檔案結構。若符合以下任一「零分條件」，請**直接調用 `write_grading_report` 給予 0 分**，並在評語中清楚說明原因（例如：「未檢測到 Python 程式碼」）。
+
+**步驟 1：確認檔案內容**
+*   檢查來源路徑是否包含 `.zip` 檔案或是 `.py` 檔案。
+*   **零分條件 1**：若無 `.zip` 檔案或是 `.py` 檔案，視為未繳交。
+
+**步驟 2：解壓縮與遞迴搜尋 (Recursive Search)**
+*   解壓縮後，請**務必遍歷所有子資料夾**（不要只看根目錄）。學生常會將作業包在多層資料夾中（例如：`homework/source/main.py`）。
+*   尋找副檔名為 `.py` 的檔案。
+
+
+**步驟 3：判定程式碼有效性與嘗試極限**
+*   **零分條件 2**：若經遞迴搜尋後，整個目錄結構中**完全不存在**任何 `.py` 檔案（例如只有資料夾、圖片或編譯檔），給予 0 分。
+*   **零分條件 3**：若找到 `.py` 檔，但檔案內容為空、無法讀取的二進制亂碼，或明顯非程式碼文本，給予 0 分。
+*   **零分條件 4（強制中止機制）**：**若經過多輪嘗試（包括但不限於：反覆解壓縮不同路徑、嘗試修復路徑錯誤、或多次搜尋深層目錄）後，仍因檔案損毀、權限問題或結構異常而無法成功讀取程式碼文本，請停止嘗試，直接給予 0 分，並註明原因為「經多次嘗試仍無法讀取檔案，檔案可能損毀或格式錯誤」。**

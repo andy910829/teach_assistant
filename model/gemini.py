@@ -11,7 +11,7 @@ load_dotenv()
 class AgentGemini:
     def __init__(self):
         genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-        self.model = genai.GenerativeModel(os.getenv('MODEL_NAME'))
+        self.model = genai.GenerativeModel(os.getenv('GEMINI_MODEL_NAME'))
         self.tools = None
         self.gemini_tools = None
 
@@ -67,6 +67,7 @@ class AgentGemini:
             generation_config=self.config,
             tools=[self.gemini_tools] if self.gemini_tools else None
         )
+        # pprint(response)
         
         # 檢查是否有函數調用
         # print("================== GEMINI response ==================")
@@ -75,7 +76,7 @@ class AgentGemini:
 
         max_try = 3
         current_try = 0
-
+        thinking = ""
         while current_try < max_try:
             try:
                 function_call = None
@@ -124,3 +125,9 @@ class AgentGemini:
                 print(response.candidates[0].finish_reason)
                 print(response)     
                 current_try += 1       
+
+if __name__ == "__main__":
+    agent = AgentGemini()
+    prompt = "寫一分關於最新AI趨勢報告?"
+    result = agent.generate_text(prompt)
+    pprint(result)

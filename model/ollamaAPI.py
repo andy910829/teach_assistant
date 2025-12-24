@@ -12,9 +12,9 @@ class AgentOllama:
     def __init__(self):
         # 初始化 Ollama 客戶端
         host = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
-        self.client = ollama.Client(host=host)
+        self.client = ollama.Client(host=host, timeout =50)
         # 你的 Log 顯示是用 qwen3:32b，請確保環境變數 MODEL_NAME 設為此值
-        self.model_name = os.getenv('MODEL_NAME', 'qwen3:32b') 
+        self.model_name = os.getenv('OLLAMA_MODEL_NAME', 'qwen3:32b') 
         self.tools = None
         self.ollama_tools = None
 
@@ -65,6 +65,7 @@ class AgentOllama:
         
         max_try = 3
         current_try = 0
+        thinking = ""
 
         while current_try < max_try:
             try:
@@ -72,23 +73,25 @@ class AgentOllama:
                 response: ChatResponse = self.client.chat(
                     model=self.model_name,
                     messages=messages,
+                    stream=False,
                     tools=self.ollama_tools if self.ollama_tools else None,
                     options={
                         "temperature": 0.1, # 降低溫度讓工具調用更精確
-                        "num_ctx": 8192     # 確保上下文長度足夠
+                        "num_ctx": 16384,    # 確保上下文長度足夠
+                        "repeat_penalty": 1.2,
                     }
                 )
-                
+                # pprint(response)
                 # --- 針對你提供的格式進行解析 ---
                 # response 是一個 ChatResponse 物件
                 # response.message 是一個 Message 物件
                 # with open("ollama_response_log.txt", "a", encoding="utf-8") as log_file:
                 #     log_file.write(response, ensure_ascii=False, indent=2)
                 #     log_file.write("\n\n====================\n\n")
-                message = response["message"] 
+                message = response.message
                 
-                content = message.content or ""
-                tool_calls = message["tool_calls"] # 這是 Object 的 list，不是 dict
+                content = message.thinking or ""
+                tool_calls = getattr(message, 'tool_calls', []) # 這是 Object 的 list，不是 dict
                 
                 # 1. 檢查是否有原生的工具調用 (Tool Calls)
                 if tool_calls:
